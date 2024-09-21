@@ -1,10 +1,8 @@
-from asyncio import StreamReader
-
 from .utils import parse_query, http_codes
 
 
 class HTTPRequest:
-    def __init__(self, reader: StreamReader):
+    def __init__(self, reader):
         self._reader = reader
         self.method = None
         self.path = None
@@ -52,7 +50,13 @@ class HTTPResponse:
         await self.writer.drain()
 
     async def done(self):
-        self.writer.close()
+        try:
+            await self.writer.aclose()
+        except:
+            try:
+                self.writer.close()
+            except:
+                pass
 
     async def send_headers(self):
         await self.write(f"HTTP/1.0 {self.status} {http_codes[self.status]}\r\n")

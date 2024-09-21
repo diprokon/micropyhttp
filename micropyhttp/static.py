@@ -1,8 +1,6 @@
 import sys
 from os import path
 
-from aiofiles import open
-
 from .http import HTTPResponse, HTTPRequest
 from .middleware import Middleware
 from .utils import mime_types
@@ -34,9 +32,10 @@ class StaticMiddleware(Middleware):
             res.content_type = get_mime_type(path.splitext(full_path)[1])
             res.status = 200
             await res.send_headers()
-            async with open(full_path, mode='r') as f:
-                async for line in f:
-                    await res.write(line)
+            with open(full_path, mode='r') as f:
+                lines = f.readlines()
+            for line in lines:
+                await res.write(line)
             await res.done()
             print("-serve static: ", path.relpath(full_path, self.static_path))
 

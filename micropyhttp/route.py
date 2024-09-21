@@ -24,7 +24,8 @@ class Route:
         return self.method == req.method and self.path == req.path
 
     async def handle(self, req: HTTPRequest, res: HTTPResponse):
-        res.content_type = self.content_type
+        if self.content_type:
+            res.content_type = self.content_type
         result = await self.handler(req=req, res=res)
         for mapper in self.mappers:
             result = mapper(result)

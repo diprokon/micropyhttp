@@ -1,5 +1,4 @@
 import asyncio
-from asyncio import StreamReader, StreamWriter
 
 from .http import HTTPRequest, HTTPResponse, HTTPNotFound, HTTPError
 from .middleware import Middleware
@@ -14,7 +13,7 @@ class WebServer:
     def add_middlewares(self, *middlewares: Middleware):
         self.middlewares.extend(middlewares)
 
-    async def _handle(self, reader: StreamReader, writer: StreamWriter):
+    async def _handle(self, reader, writer):
         res = HTTPResponse(writer)
         try:
             req = HTTPRequest(reader)
