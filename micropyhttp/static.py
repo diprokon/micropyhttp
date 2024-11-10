@@ -1,5 +1,5 @@
 import sys
-from os import path
+from os import path, listdir
 
 from .http import HTTPResponse, HTTPRequest
 from .middleware import Middleware
@@ -14,7 +14,9 @@ def get_mime_type(ext: str):
 
 class StaticMiddleware(Middleware):
     def __init__(self, static_path=None):
-        self.static_path = path.normpath(path.join(path.dirname(sys.argv[0]), static_path))
+        if static_path is None:
+            static_path = path.normpath(path.join(path.dirname(sys.argv[0]), "static"))
+        self.static_path = static_path
 
     async def __call__(self, req: HTTPRequest, res: HTTPResponse, _next):
         full_path = "./" + req.path
@@ -22,6 +24,7 @@ class StaticMiddleware(Middleware):
             full_path = full_path + "index.html"
         full_path = path.join(self.static_path, full_path)
         full_path = path.normpath(full_path)
+
         try:
             if len(path.commonprefix([self.static_path, full_path])) != len(self.static_path):
                 raise Exception()
